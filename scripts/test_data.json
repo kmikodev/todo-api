@@ -1,0 +1,216 @@
+{
+  "testTasks": [
+    {
+      "title": "Desarrollar nueva funcionalidad de login",
+      "description": "Implementar autenticación OAuth2 con Google y GitHub",
+      "priority": "high",
+      "dueDate": "2024-01-25T17:00:00.000Z",
+      "completed": false
+    },
+    {
+      "title": "Revisar pull requests pendientes",
+      "description": "Hacer code review de los PRs #142, #143 y #144",
+      "priority": "medium",
+      "dueDate": "2024-01-22T12:00:00.000Z",
+      "completed": false
+    },
+    {
+      "title": "Actualizar dependencias del proyecto",
+      "description": "Actualizar Node.js, Express y todas las dependencias a sus últimas versiones",
+      "priority": "low", 
+      "dueDate": "2024-01-30T23:59:59.999Z",
+      "completed": false
+    },
+    {
+      "title": "Preparar demo para cliente",
+      "description": "Crear presentación y demo funcional del dashboard de analytics",
+      "priority": "high",
+      "dueDate": "2024-01-24T14:00:00.000Z",
+      "completed": false
+    },
+    {
+      "title": "Documentar API endpoints",
+      "description": "Completar documentación Swagger para todos los endpoints de la API",
+      "priority": "medium",
+      "dueDate": "2024-01-28T16:00:00.000Z",
+      "completed": true
+    },
+    {
+      "title": "Configurar CI/CD pipeline",
+      "description": "Implementar pipeline de deployment automático con GitHub Actions",
+      "priority": "medium",
+      "dueDate": "2024-01-26T10:00:00.000Z",
+      "completed": false
+    },
+    {
+      "title": "Optimizar consultas de base de datos",
+      "description": "Revisar y optimizar las consultas SQL más lentas identificadas en el profiler",
+      "priority": "high",
+      "dueDate": "2024-01-23T18:00:00.000Z",
+      "completed": false
+    },
+    {
+      "title": "Escribir tests unitarios",
+      "description": "Alcanzar 80% de cobertura de código con tests unitarios",
+      "priority": "medium",
+      "dueDate": "2024-02-01T12:00:00.000Z",
+      "completed": false
+    },
+    {
+      "title": "Refactorizar módulo de pagos",
+      "description": "Limpiar y modularizar el código del sistema de pagos",
+      "priority": "low",
+      "dueDate": "2024-02-05T17:00:00.000Z",
+      "completed": false
+    },
+    {
+      "title": "Investigar nuevas tecnologías",
+      "description": "Evaluar React 19, Next.js 15 y otras tecnologías para el roadmap 2024",
+      "priority": "low",
+      "completed": false
+    },
+    {
+      "title": "Reunión de retrospectiva del sprint",
+      "description": "Facilitar la retrospectiva del sprint 23 con el equipo de desarrollo",
+      "priority": "medium",
+      "dueDate": "2024-01-19T15:00:00.000Z",
+      "completed": true
+    },
+    {
+      "title": "Backup de base de datos",
+      "description": "Configurar backup automático diario de la base de datos de producción",
+      "priority": "high",
+      "dueDate": "2024-01-21T09:00:00.000Z",
+      "completed": true
+    },
+    {
+      "title": "Comprar regalo de cumpleaños",
+      "description": "Buscar y comprar regalo para el cumpleaños de mamá el próximo domingo",
+      "priority": "medium",
+      "dueDate": "2024-01-20T10:00:00.000Z",
+      "completed": false
+    },
+    {
+      "title": "Reservar hotel para conferencia",
+      "description": "Hacer reservación de hotel para la conferencia DevCon 2024 en Barcelona",
+      "priority": "low",
+      "dueDate": "2024-01-27T23:59:59.999Z",
+      "completed": false
+    },
+    {
+      "title": "Llamar al dentista",
+      "description": "Agendar cita para limpieza dental semestral",
+      "priority": "low",
+      "dueDate": "2024-01-22T18:00:00.000Z",
+      "completed": false
+    },
+    {
+      "title": "Revisar contratos legales",
+      "description": "Revisar y firmar los contratos con el nuevo proveedor de hosting",
+      "priority": "high",
+      "dueDate": "2024-01-24T12:00:00.000Z",
+      "completed": false
+    },
+    {
+      "title": "Planificar vacaciones de verano",
+      "description": "Investigar destinos y hacer itinerario para las vacaciones familiares",
+      "priority": "low",
+      "dueDate": "2024-02-15T23:59:59.999Z",
+      "completed": false
+    },
+    {
+      "title": "Entrenamiento de seguridad",
+      "description": "Completar el curso obligatorio de ciberseguridad de la empresa",
+      "priority": "medium",
+      "dueDate": "2024-01-31T17:00:00.000Z",
+      "completed": false
+    },
+    {
+      "title": "Renovar certificado SSL",
+      "description": "Renovar certificado SSL del dominio principal antes de que expire",
+      "priority": "high",
+      "dueDate": "2024-01-23T09:00:00.000Z",
+      "completed": true
+    },
+    {
+      "title": "Organizar archivos del proyecto",
+      "description": "Limpiar y organizar la estructura de carpetas del repositorio",
+      "priority": "low",
+      "completed": false
+    }
+  ],
+  "testScenarios": {
+    "bulkOperations": {
+      "completeMultiple": [
+        "Crear 5 tareas",
+        "Obtener sus IDs",
+        "Completarlas todas de una vez usando bulk/complete"
+      ],
+      "deleteCompleted": [
+        "Asegurarse de tener tareas completadas",
+        "Usar bulk/completed para eliminarlas todas"
+      ]
+    },
+    "filtering": {
+      "byPriority": {
+        "high": "Filtrar solo tareas de prioridad alta",
+        "medium": "Filtrar solo tareas de prioridad media",
+        "low": "Filtrar solo tareas de prioridad baja"
+      },
+      "byStatus": {
+        "completed": "Ver solo tareas completadas",
+        "pending": "Ver solo tareas pendientes"
+      },
+      "bySearch": {
+        "code": "Buscar tareas relacionadas con 'código'",
+        "meeting": "Buscar tareas relacionadas con 'reunión'",
+        "api": "Buscar tareas relacionadas con 'API'"
+      }
+    },
+    "sorting": {
+      "byDueDate": "Ordenar por fecha de vencimiento (ascendente)",
+      "byTitle": "Ordenar alfabéticamente por título",
+      "byCreated": "Ordenar por fecha de creación (más recientes primero)"
+    },
+    "pagination": {
+      "smallPages": "Usar limit=3 para ver paginación claramente",
+      "navigation": "Navegar entre páginas usando page parameter"
+    },
+    "errorCases": {
+      "validation": "Probar con datos inválidos",
+      "notFound": "Buscar tareas que no existen",
+      "malformedData": "Enviar JSON malformado"
+    }
+  },
+  "quickTestCommands": {
+    "curl": {
+      "createTask": "curl -X POST http://localhost:3000/api/tasks -H 'Content-Type: application/json' -d '{\"title\":\"Test Task\",\"priority\":\"high\"}'",
+      "getAllTasks": "curl http://localhost:3000/api/tasks",
+      "getStats": "curl http://localhost:3000/api/tasks/stats",
+      "searchTasks": "curl 'http://localhost:3000/api/tasks?search=test'",
+      "highPriorityTasks": "curl 'http://localhost:3000/api/tasks?priority=high&completed=false'"
+    },
+    "javascript": {
+      "createTask": "fetch('/api/tasks', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({title: 'Test Task', priority: 'high'})})",
+      "getAllTasks": "fetch('/api/tasks').then(r => r.json())",
+      "getStats": "fetch('/api/tasks/stats').then(r => r.json())"
+    }
+  },
+  "performanceTests": {
+    "createMany": {
+      "description": "Crear 100 tareas rápidamente para probar rendimiento",
+      "endpoint": "POST /api/tasks",
+      "iterations": 100
+    },
+    "searchLarge": {
+      "description": "Buscar en una base de datos con muchas tareas",
+      "endpoint": "GET /api/tasks?search=test",
+      "prerequisite": "Tener al menos 1000 tareas"
+    },
+    "bulkOperations": {
+      "description": "Probar operaciones en lote con el máximo permitido",
+      "endpoint": "POST /api/tasks/bulk/complete",
+      "maxItems": 100
+    }
+  }
+}
