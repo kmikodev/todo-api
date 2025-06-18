@@ -1,9 +1,9 @@
 {
   "info": {
-    "name": "TODO API - Complete Collection",
-    "description": "Colección completa para probar la TODO API con datos de ejemplo",
+    "name": "TODO API v2.0 - Complete Collection",
+    "description": "Colección completa actualizada para la TODO API v2.0 con todas las nuevas funcionalidades: filtros de fecha, resumen diario mejorado, y operaciones avanzadas",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "variable": [
     {
@@ -13,6 +13,16 @@
     },
     {
       "key": "taskId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "taskId2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "taskId3",
       "value": "",
       "type": "string"
     }
@@ -59,6 +69,45 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Ping",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ping",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ping"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🆕 Available Endpoints",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/endpoints",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "endpoints"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🆕 Quick Start Guide",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/quick-start",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "quick-start"]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -66,7 +115,7 @@
       "name": "📋 CRUD Operations",
       "item": [
         {
-          "name": "Create Task - High Priority",
+          "name": "Create Task - High Priority (Urgent)",
           "event": [
             {
               "listen": "test",
@@ -92,7 +141,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Completar presentación ejecutiva\",\n  \"description\": \"Preparar slides para la reunión con inversionistas del próximo viernes\",\n  \"priority\": \"high\",\n  \"dueDate\": \"2024-01-25T17:00:00.000Z\"\n}"
+              "raw": "{\n  \"title\": \"🚨 URGENTE: Corregir bug crítico en producción\",\n  \"description\": \"El sistema de autenticación está fallando para usuarios premium. Afecta al 15% de los usuarios activos.\",\n  \"priority\": \"high\",\n  \"dueDate\": \"2024-06-19T17:00:00.000Z\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/tasks",
@@ -103,7 +152,22 @@
           "response": []
         },
         {
-          "name": "Create Task - Medium Priority",
+          "name": "Create Task - Medium Priority (Work)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('taskId2', response.data.id);",
+                  "    console.log('Task ID2 saved:', response.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -114,7 +178,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Revisar código del módulo de autenticación\",\n  \"description\": \"Code review del PR #142 - implementación de JWT tokens\",\n  \"priority\": \"medium\",\n  \"dueDate\": \"2024-01-22T12:00:00.000Z\"\n}"
+              "raw": "{\n  \"title\": \"Revisar código del módulo de pagos\",\n  \"description\": \"Code review del PR #245 - integración con Stripe y mejoras en el manejo de errores\",\n  \"priority\": \"medium\",\n  \"dueDate\": \"2024-06-22T12:00:00.000Z\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/tasks",
@@ -125,7 +189,22 @@
           "response": []
         },
         {
-          "name": "Create Task - Low Priority",
+          "name": "Create Task - Low Priority (Documentation)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('taskId3', response.data.id);",
+                  "    console.log('Task ID3 saved:', response.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -136,7 +215,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Actualizar documentación de la API\",\n  \"description\": \"Agregar ejemplos de uso y casos de edge cases en la documentación\",\n  \"priority\": \"low\",\n  \"dueDate\": \"2024-01-30T23:59:59.999Z\"\n}"
+              "raw": "{\n  \"title\": \"Actualizar documentación de la API v2.0\",\n  \"description\": \"Agregar ejemplos de las nuevas funcionalidades: filtros de fecha, resumen diario mejorado, y operaciones bulk\",\n  \"priority\": \"low\",\n  \"dueDate\": \"2024-06-30T23:59:59.999Z\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/tasks",
@@ -147,7 +226,7 @@
           "response": []
         },
         {
-          "name": "Create Task - No Due Date",
+          "name": "Create Task - No Due Date (Research)",
           "request": {
             "method": "POST",
             "header": [
@@ -158,7 +237,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Investigar nuevas tecnologías\",\n  \"description\": \"Evaluar React 19, Next.js 15 y otras tecnologías emergentes\",\n  \"priority\": \"low\"\n}"
+              "raw": "{\n  \"title\": \"Investigar tecnologías emergentes\",\n  \"description\": \"Evaluar React 19, Next.js 15, Bun 1.1, y otras tecnologías que podrían mejorar nuestro stack\",\n  \"priority\": \"low\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/tasks",
@@ -169,7 +248,7 @@
           "response": []
         },
         {
-          "name": "Create Task - Personal",
+          "name": "Create Task - Personal (Overdue Example)",
           "request": {
             "method": "POST",
             "header": [
@@ -180,7 +259,29 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Comprar regalo de cumpleaños\",\n  \"description\": \"Buscar y comprar regalo para el cumpleaños de mamá\",\n  \"priority\": \"medium\",\n  \"dueDate\": \"2024-01-20T10:00:00.000Z\"\n}"
+              "raw": "{\n  \"title\": \"Comprar regalo de cumpleaños\",\n  \"description\": \"Buscar y comprar regalo para el cumpleaños de mamá - ¡Ya pasó la fecha!\",\n  \"priority\": \"medium\",\n  \"dueDate\": \"2024-06-15T10:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Task - Due Today",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Reunión de equipo semanal\",\n  \"description\": \"Standup meeting y revisión de objetivos de la semana\",\n  \"priority\": \"medium\",\n  \"dueDate\": \"2024-06-18T15:00:00.000Z\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/tasks",
@@ -217,7 +318,7 @@
           "response": []
         },
         {
-          "name": "Update Task - Complete",
+          "name": "Update Task - Complete PUT",
           "request": {
             "method": "PUT",
             "header": [
@@ -228,7 +329,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Completar presentación ejecutiva\",\n  \"description\": \"Preparar slides para la reunión con inversionistas del próximo viernes - COMPLETADO\",\n  \"completed\": true,\n  \"priority\": \"high\",\n  \"dueDate\": \"2024-01-25T17:00:00.000Z\"\n}"
+              "raw": "{\n  \"title\": \"🚨 URGENTE: Corregir bug crítico en producción - RESUELTO\",\n  \"description\": \"El sistema de autenticación está fallando para usuarios premium. Afecta al 15% de los usuarios activos. ✅ SOLUCIONADO\",\n  \"completed\": true,\n  \"priority\": \"high\",\n  \"dueDate\": \"2024-06-19T17:00:00.000Z\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
@@ -239,7 +340,7 @@
           "response": []
         },
         {
-          "name": "Partial Update - Change Priority",
+          "name": "Partial Update - Change Priority PATCH",
           "request": {
             "method": "PATCH",
             "header": [
@@ -250,7 +351,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"priority\": \"low\"\n}"
+              "raw": "{\n  \"priority\": \"low\",\n  \"description\": \"Ya no es urgente, se ha solucionado el problema principal\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
@@ -266,9 +367,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+              "raw": "{{baseUrl}}/api/tasks/{{taskId3}}",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "tasks", "{{taskId}}"]
+              "path": ["api", "tasks", "{{taskId3}}"]
             }
           },
           "response": []
@@ -336,18 +437,72 @@
           "response": []
         },
         {
-          "name": "Search Tasks - 'presentación'",
+          "name": "🆕 Filter by Date Range",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/tasks?search=presentación",
+              "raw": "{{baseUrl}}/api/tasks?dueDateFrom=2024-06-01&dueDateTo=2024-06-30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "dueDateFrom",
+                  "value": "2024-06-01"
+                },
+                {
+                  "key": "dueDateTo",
+                  "value": "2024-06-30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🆕 Complex Filter - High Priority in Date Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?priority=high&dueDateFrom=2024-06-15&dueDateTo=2024-06-25&completed=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "priority",
+                  "value": "high"
+                },
+                {
+                  "key": "dueDateFrom",
+                  "value": "2024-06-15"
+                },
+                {
+                  "key": "dueDateTo",
+                  "value": "2024-06-25"
+                },
+                {
+                  "key": "completed",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Tasks - 'bug'",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?search=bug",
               "host": ["{{baseUrl}}"],
               "path": ["api", "tasks"],
               "query": [
                 {
                   "key": "search",
-                  "value": "presentación"
+                  "value": "bug"
                 }
               ]
             }
@@ -422,12 +577,35 @@
           "response": []
         },
         {
-          "name": "Sort by Title (Descending)",
+          "name": "Sort by Priority (High to Low)",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/tasks?sortBy=title&sortOrder=desc",
+              "raw": "{{baseUrl}}/api/tasks?sortBy=priority&sortOrder=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "sortBy",
+                  "value": "priority"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sort by Title (Alphabetical)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?sortBy=title&sortOrder=asc",
               "host": ["{{baseUrl}}"],
               "path": ["api", "tasks"],
               "query": [
@@ -437,7 +615,7 @@
                 },
                 {
                   "key": "sortOrder",
-                  "value": "desc"
+                  "value": "asc"
                 }
               ]
             }
@@ -491,7 +669,7 @@
           "response": []
         },
         {
-          "name": "Complex Filter - High Priority Pending",
+          "name": "Complex Filter - High Priority Pending with Pagination",
           "request": {
             "method": "GET",
             "header": [],
@@ -523,6 +701,104 @@
                 {
                   "key": "limit",
                   "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📅 Date-based Queries (NEW)",
+      "item": [
+        {
+          "name": "🆕 Get Tasks Due This Week",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/due-this-week",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "due-this-week"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🆕 Get Tasks Due Next Week",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/due-next-week",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "due-next-week"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🆕 Get Tasks Due This Month",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/due-this-month",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "due-this-month"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🆕 Get Tasks in Custom Date Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/date-range?startDate=2024-06-01&endDate=2024-06-30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "date-range"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-06-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-06-30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🆕 Date Range with Priority Filter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/date-range?startDate=2024-06-15&endDate=2024-06-25&priority=high&completed=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "date-range"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-06-15"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-06-25"
+                },
+                {
+                  "key": "priority",
+                  "value": "high"
+                },
+                {
+                  "key": "completed",
+                  "value": "false"
                 }
               ]
             }
@@ -575,9 +851,9 @@
               "raw": "{\n  \"priority\": \"high\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/priority",
+              "raw": "{{baseUrl}}/api/tasks/{{taskId2}}/priority",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "tasks", "{{taskId}}", "priority"]
+              "path": ["api", "tasks", "{{taskId2}}", "priority"]
             }
           },
           "response": []
@@ -594,12 +870,34 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"dueDate\": \"2024-01-28T15:30:00.000Z\"\n}"
+              "raw": "{\n  \"dueDate\": \"2024-06-25T15:30:00.000Z\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/due-date",
+              "raw": "{{baseUrl}}/api/tasks/{{taskId2}}/due-date",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "tasks", "{{taskId}}", "due-date"]
+              "path": ["api", "tasks", "{{taskId2}}", "due-date"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Due Date",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dueDate\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId2}}/due-date",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId2}}", "due-date"]
             }
           },
           "response": []
@@ -616,12 +914,34 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Copia de la presentación ejecutiva\"\n}"
+              "raw": "{\n  \"title\": \"Copia - Revisar código del módulo de pagos\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/duplicate",
+              "raw": "{{baseUrl}}/api/tasks/{{taskId2}}/duplicate",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "tasks", "{{taskId}}", "duplicate"]
+              "path": ["api", "tasks", "{{taskId2}}", "duplicate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Duplicate Task (Auto Title)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId2}}/duplicate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId2}}", "duplicate"]
             }
           },
           "response": []
@@ -629,7 +949,7 @@
       ]
     },
     {
-      "name": "📈 Statistics & Special Queries",
+      "name": "📈 Statistics & Analytics",
       "item": [
         {
           "name": "Get Task Statistics",
@@ -640,6 +960,19 @@
               "raw": "{{baseUrl}}/api/tasks/stats",
               "host": ["{{baseUrl}}"],
               "path": ["api", "tasks", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🆕 Enhanced Daily Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/daily-summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "daily-summary"]
             }
           },
           "response": []
@@ -669,6 +1002,25 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Overdue with Priority Filter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/overdue?priority=high",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "overdue"],
+              "query": [
+                {
+                  "key": "priority",
+                  "value": "high"
+                }
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -687,7 +1039,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ids\": [\n    \"550e8400-e29b-41d4-a716-446655440000\",\n    \"550e8400-e29b-41d4-a716-446655440001\"\n  ]\n}"
+              "raw": "{\n  \"ids\": [\n    \"{{taskId}}\",\n    \"{{taskId2}}\"\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/tasks/bulk/complete",
@@ -722,7 +1074,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ids\": [\n    \"550e8400-e29b-41d4-a716-446655440000\",\n    \"550e8400-e29b-41d4-a716-446655440001\"\n  ]\n}"
+              "raw": "{\n  \"ids\": [\n    \"{{taskId}}\",\n    \"{{taskId2}}\"\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/tasks/bulk/delete",
@@ -731,6 +1083,145 @@
             }
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "🧪 Testing Scenarios",
+      "item": [
+        {
+          "name": "📊 Workflow: Complete Daily Tasks",
+          "item": [
+            {
+              "name": "1. Check Daily Summary",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/daily-summary",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "daily-summary"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "2. Get Tasks Due Today",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/due-today",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "due-today"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "3. Get Overdue High Priority",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/overdue?priority=high&sortBy=dueDate&sortOrder=asc",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "overdue"],
+                  "query": [
+                    {
+                      "key": "priority",
+                      "value": "high"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "dueDate"
+                    },
+                    {
+                      "key": "sortOrder",
+                      "value": "asc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "4. Complete Urgent Task",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/{{taskId}}/complete",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "{{taskId}}", "complete"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "📋 Workflow: Project Planning",
+          "item": [
+            {
+              "name": "1. Get Tasks This Week",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/due-this-week?sortBy=priority&sortOrder=desc",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "due-this-week"],
+                  "query": [
+                    {
+                      "key": "sortBy",
+                      "value": "priority"
+                    },
+                    {
+                      "key": "sortOrder",
+                      "value": "desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "2. Get Tasks Next Week",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/due-next-week",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "due-next-week"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "3. Update Priorities",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"priority\": \"high\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/tasks/{{taskId2}}/priority",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tasks", "{{taskId2}}", "priority"]
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     },
@@ -782,6 +1273,28 @@
           "response": []
         },
         {
+          "name": "Create Task - Invalid Date Format (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Tarea con fecha inválida\",\n  \"dueDate\": \"invalid-date-format\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Get Non-existent Task (404)",
           "request": {
             "method": "GET",
@@ -800,9 +1313,32 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/tasks/invalid-uuid",
+              "raw": "{{baseUrl}}/api/tasks/invalid-uuid-format",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "tasks", "invalid-uuid"]
+              "path": ["api", "tasks", "invalid-uuid-format"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "🆕 Invalid Date Range (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/date-range?startDate=2024-06-30&endDate=2024-06-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "date-range"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-06-30"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-06-01"
+                }
+              ]
             }
           },
           "response": []
@@ -825,6 +1361,28 @@
               "raw": "{{baseUrl}}/api/tasks",
               "host": ["{{baseUrl}}"],
               "path": ["api", "tasks"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Empty Bulk IDs Array (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/bulk/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "bulk", "complete"]
             }
           },
           "response": []
