@@ -32,7 +32,6 @@ class TaskController {
       };
 
       const result = await taskService.getAllTasks(options);
-      console.log('Tasks retrieved:', result.data.length, 'Total:', result.meta.total);
       sendPaginated(
         res,
         result.data,
