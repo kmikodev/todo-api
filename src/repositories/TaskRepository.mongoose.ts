@@ -276,7 +276,10 @@ export class TaskRepositoryMongoose implements ITaskRepository {
   }
 
   async getStatistics(): Promise<TaskStatistics> {
+
     const now = new Date();
+
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const pipeline = [
       {
@@ -302,7 +305,7 @@ export class TaskRepositoryMongoose implements ITaskRepository {
             {
               $match: {
                 completed: false,
-                dueDate: { $lt: now, $ne: null }
+                dueDate: { $lt: startOfDay, $ne: null }
               }
             },
             { $count: 'count' }

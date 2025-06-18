@@ -96,6 +96,7 @@ export class TaskRepositoryPrisma implements ITaskRepository {
   async getStatistics(): Promise<TaskStatistics> {
     const now = new Date();
 
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const [
       total,
       completed,
@@ -115,7 +116,7 @@ export class TaskRepositoryPrisma implements ITaskRepository {
         where: {
           completed: false,
           dueDate: {
-            lt: now
+            lt: startOfDay
           }
         }
       })
@@ -183,8 +184,9 @@ export class TaskRepositoryPrisma implements ITaskRepository {
   }
 
   async findOverdue(): Promise<Task[]> {
-    const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
 
     const tasks = await this.prisma.task.findMany({
       where: {
