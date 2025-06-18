@@ -184,11 +184,13 @@ export class TaskRepositoryPrisma implements ITaskRepository {
 
   async findOverdue(): Promise<Task[]> {
     const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
     const tasks = await this.prisma.task.findMany({
       where: {
         completed: false,
         dueDate: {
-          lt: now
+          lt: startOfDay
         }
       }
     });
