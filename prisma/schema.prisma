@@ -1,15 +1,53 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgresql" // Cambia a "mysql" o "sqlite" según tu preferencia
   url      = env("DATABASE_URL")
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  title       String    @db.VarChar(200)
+  description String?   @db.Text
+  completed   Boolean   @default(false)
+  priority    Priority  @default(medium)
+  dueDate     DateTime? @map("due_date")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Índices para optimización de consultas
+  @@index([completed])
+  @@index([priority])
+  @@index([dueDate])
+  @@index([createdAt])
+  @@index([title])
+  @@index([completed, priority])
+  @@index([dueDate, completed])
+  
+  @@map("tasks")
+}
+
+enum Priority {
+  low
+  medium
+  high
+}
+
+// Opcional: Modelo para auditoría/logs (si quieres tracking avanzado)
+model TaskAudit {
+  id        String   @id @default(cuid())
+  taskId    String   @map("task_id")
+  action    String   // CREATE, UPDATE, DELETE, COMPLETE, etc.
+  oldValues Json?    @map("old_values")
+  newValues Json?    @map("new_values")
+  timestamp DateTime @default(now())
+  
+  @@index([taskId])
+  @@index([timestamp])
+  @@map("task_audits")
 }

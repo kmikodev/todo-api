@@ -1,77 +1,75 @@
-# TODO API Documentation 📖
+# TODO API Documentation
 
-Documentación completa de la API REST para gestión de tareas.
+## Overview
 
-## 📋 Tabla de Contenidos
+A comprehensive RESTful API for managing TODO tasks with advanced filtering, analytics, and bulk operations. Built with Node.js, Express, TypeScript, and supports multiple database backends (Memory, MongoDB, PostgreSQL/MySQL via Prisma).
 
-- [Información General](#información-general)
-- [Autenticación](#autenticación)
-- [Formato de Respuestas](#formato-de-respuestas)
-- [Manejo de Errores](#manejo-de-errores)
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Authentication](#authentication)
+- [Base URL](#base-url)
+- [Response Format](#response-format)
+- [Error Handling](#error-handling)
 - [Endpoints](#endpoints)
-  - [Health Check](#health-check)
-  - [Información de la API](#información-de-la-api)
-  - [Gestión de Tareas](#gestión-de-tareas)
-  - [Estadísticas](#estadísticas)
-  - [Operaciones en Lote](#operaciones-en-lote)
-  - [Búsqueda y Filtros](#búsqueda-y-filtros)
-- [Códigos de Error](#códigos-de-error)
-- [Rate Limiting](#rate-limiting)
-- [Ejemplos de Uso](#ejemplos-de-uso)
+- [Query Parameters](#query-parameters)
+- [Examples](#examples)
+- [Database Configuration](#database-configuration)
 
-## 🌐 Información General
+## Quick Start
 
-**URL Base:** `http://localhost:3000/api`
+1. **Create your first task**
+   ```bash
+   curl -X POST http://localhost:3000/api/tasks \
+     -H "Content-Type: application/json" \
+     -d '{"title": "My first task", "priority": "medium"}'
+   ```
 
-**Versión:** v1.0.0
+2. **Get all tasks**
+   ```bash
+   curl http://localhost:3000/api/tasks
+   ```
 
-**Content-Type:** `application/json`
+3. **Check daily summary**
+   ```bash
+   curl http://localhost:3000/api/tasks/daily-summary
+   ```
 
-**Métodos HTTP Soportados:** GET, POST, PUT, PATCH, DELETE
+## Authentication
 
-## 🔐 Autenticación
+Currently, this API does not require authentication. All endpoints are publicly accessible.
 
-Actualmente la API no requiere autenticación. En futuras versiones se implementará:
-- JWT tokens
-- API keys
-- OAuth 2.0
+## Base URL
 
-## 📤 Formato de Respuestas
+```
+http://localhost:3000/api
+```
 
-### Respuesta Exitosa
+## Response Format
 
+### Success Response
 ```json
 {
   "success": true,
-  "data": {
-    // Datos de la respuesta
-  },
-  "message": "Operación realizada exitosamente",
+  "data": {},
+  "message": "Operation completed successfully",
   "meta": {
     "timestamp": "2024-01-15T10:30:00.000Z",
-    "pagination": {
-      "page": 1,
-      "limit": 10,
-      "total": 50,
-      "totalPages": 5,
-      "hasNext": true,
-      "hasPrev": false
-    }
+    "total": 100,
+    "page": 1,
+    "limit": 10
   }
 }
 ```
 
-### Respuesta de Error
-
+### Error Response
 ```json
 {
   "success": false,
   "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Los datos proporcionados no son válidos",
-    "details": {
-      "errors": ["title is required", "priority must be one of: low, medium, high"]
-    }
+    "code": "NOT_FOUND",
+    "message": "Task not found",
+    "details": {}
   },
   "meta": {
     "timestamp": "2024-01-15T10:30:00.000Z"
@@ -79,624 +77,399 @@ Actualmente la API no requiere autenticación. En futuras versiones se implement
 }
 ```
 
-## ❌ Manejo de Errores
+## Error Handling
 
-### Códigos de Estado HTTP
+| Status Code | Error Code | Description |
+|-------------|------------|-------------|
+| 400 | BAD_REQUEST | Invalid request data |
+| 404 | NOT_FOUND | Resource not found |
+| 409 | CONFLICT | Resource already exists |
+| 422 | VALIDATION_ERROR | Validation failed |
+| 500 | INTERNAL_ERROR | Server error |
 
-- `200` - OK
-- `201` - Created
-- `400` - Bad Request
-- `404` - Not Found
-- `409` - Conflict
-- `422` - Unprocessable Entity
-- `500` - Internal Server Error
+## Endpoints
 
-### Códigos de Error Personalizados
+### Health & Information
 
-| Código | Descripción |
-|--------|-------------|
-| `VALIDATION_ERROR` | Error de validación de datos |
-| `NOT_FOUND` | Recurso no encontrado |
-| `DUPLICATE_ERROR` | Recurso duplicado |
-| `BULK_LIMIT_EXCEEDED` | Límite de operaciones en lote excedido |
-| `INTERNAL_ERROR` | Error interno del servidor |
+#### GET /health
+Health check endpoint.
 
-## 🔗 Endpoints
-
-### Health Check
-
-#### GET `/health`
-
-Verifica el estado de la API.
-
-**Respuesta:**
+**Response:**
 ```json
 {
   "status": "OK",
   "message": "TODO API is running",
   "timestamp": "2024-01-15T10:30:00.000Z",
-  "uptime": 3600
-}
-```
-
-### Información de la API
-
-#### GET `/api/`
-
-Obtiene información general de la API y documentación.
-
-**Respuesta:**
-```json
-{
-  "message": "Welcome to TODO API",
-  "version": "1.0.0",
-  "documentation": {
-    "swagger": "/api/docs",
-    "endpoints": {
-      "tasks": "/api/tasks",
-      "health": "/health"
-    }
-  },
-  "features": [
-    "Create, read, update, delete tasks",
-    "Filter tasks by completion status and priority",
-    "Search tasks by title and description",
-    "Sort tasks by various fields",
-    "Pagination support",
-    "Task statistics",
-    "Bulk operations"
-  ]
-}
-```
-
-#### GET `/api/info`
-
-Información técnica detallada de la API.
-
-**Respuesta:**
-```json
-{
-  "name": "TODO API",
-  "version": "1.0.0",
-  "description": "A RESTful API for managing TODO tasks",
-  "technologies": ["Node.js", "Express.js", "TypeScript", "Bun"],
-  "patterns": ["Facade Pattern", "Factory Pattern", "Repository Pattern"],
   "uptime": 3600,
-  "environment": "development"
+  "database": "memory"
 }
 ```
 
-### Gestión de Tareas
+#### GET /api/
+Welcome message and API overview.
 
-#### GET `/api/tasks`
+#### GET /api/info
+Detailed API information including version, features, and statistics.
 
-Obtiene todas las tareas con filtros opcionales.
+#### GET /api/ping
+Simple ping endpoint that returns "pong".
 
-**Parámetros de Query:**
+### Tasks - Basic CRUD
 
-| Parámetro | Tipo | Descripción | Ejemplo |
-|-----------|------|-------------|---------|
-| `page` | number | Número de página (default: 1) | `?page=2` |
-| `limit` | number | Elementos por página (default: 10, max: 100) | `?limit=20` |
-| `completed` | boolean | Filtrar por estado de completado | `?completed=true` |
-| `priority` | string | Filtrar por prioridad (low, medium, high) | `?priority=high` |
-| `search` | string | Búsqueda en título y descripción | `?search=importante` |
-| `sortBy` | string | Campo de ordenamiento | `?sortBy=dueDate` |
-| `sortOrder` | string | Orden (asc, desc) | `?sortOrder=desc` |
+#### GET /api/tasks
+Get all tasks with optional filtering, sorting, and pagination.
 
-**Ejemplo:**
+**Query Parameters:**
+- `completed` (boolean): Filter by completion status
+- `priority` (string): Filter by priority (low, medium, high)
+- `search` (string): Search in title and description
+- `dueDateFrom` (string): Filter tasks from this date (ISO format)
+- `dueDateTo` (string): Filter tasks until this date (ISO format)
+- `sortBy` (string): Sort field (createdAt, updatedAt, title, dueDate, priority)
+- `sortOrder` (string): Sort direction (asc, desc)
+- `page` (number): Page number (default: 1)
+- `limit` (number): Items per page (default: 10, max: 100)
+
+**Example:**
 ```bash
-GET /api/tasks?completed=false&priority=high&page=1&limit=5
+curl "http://localhost:3000/api/tasks?priority=high&completed=false&page=1&limit=5"
 ```
 
-**Respuesta:**
+#### POST /api/tasks
+Create a new task.
+
+**Request Body:**
 ```json
 {
-  "success": true,
-  "data": [
-    {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "title": "Completar proyecto",
-      "description": "Finalizar el desarrollo de la API",
-      "completed": false,
-      "priority": "high",
-      "dueDate": "2024-01-20T23:59:59.999Z",
-      "createdAt": "2024-01-15T10:30:00.000Z",
-      "updatedAt": "2024-01-15T10:30:00.000Z"
-    }
-  ],
-  "message": "Tasks retrieved successfully",
-  "meta": {
-    "timestamp": "2024-01-15T10:30:00.000Z",
-    "pagination": {
-      "page": 1,
-      "limit": 5,
-      "total": 25,
-      "totalPages": 5,
-      "hasNext": true,
-      "hasPrev": false
-    }
-  }
-}
-```
-
-#### GET `/api/tasks/:id`
-
-Obtiene una tarea específica por ID.
-
-**Parámetros:**
-- `id` (string, required): UUID de la tarea
-
-**Respuesta:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "title": "Completar proyecto",
-    "description": "Finalizar el desarrollo de la API",
-    "completed": false,
-    "priority": "high",
-    "dueDate": "2024-01-20T23:59:59.999Z",
-    "createdAt": "2024-01-15T10:30:00.000Z",
-    "updatedAt": "2024-01-15T10:30:00.000Z"
-  },
-  "message": "Task retrieved successfully"
-}
-```
-
-#### POST `/api/tasks`
-
-Crea una nueva tarea.
-
-**Body:**
-```json
-{
-  "title": "Nueva tarea",
-  "description": "Descripción opcional",
-  "priority": "medium",
-  "dueDate": "2024-01-20T23:59:59.999Z"
-}
-```
-
-**Campos:**
-
-| Campo | Tipo | Requerido | Descripción |
-|-------|------|-----------|-------------|
-| `title` | string | ✅ | Título de la tarea (1-200 caracteres) |
-| `description` | string | ❌ | Descripción (max 1000 caracteres) |
-| `completed` | boolean | ❌ | Estado de completado (default: false) |
-| `priority` | string | ❌ | Prioridad: low, medium, high (default: medium) |
-| `dueDate` | string | ❌ | Fecha de vencimiento en formato ISO |
-
-**Respuesta:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440001",
-    "title": "Nueva tarea",
-    "description": "Descripción opcional",
-    "completed": false,
-    "priority": "medium",
-    "dueDate": "2024-01-20T23:59:59.999Z",
-    "createdAt": "2024-01-15T10:30:00.000Z",
-    "updatedAt": "2024-01-15T10:30:00.000Z"
-  },
-  "message": "Task created successfully"
-}
-```
-
-#### PUT `/api/tasks/:id`
-
-Actualiza una tarea completa.
-
-**Body:**
-```json
-{
-  "title": "Tarea actualizada",
-  "description": "Nueva descripción",
-  "completed": true,
+  "title": "Complete project documentation",
+  "description": "Write comprehensive API documentation",
   "priority": "high",
-  "dueDate": "2024-01-25T23:59:59.999Z"
+  "dueDate": "2024-01-20T23:59:59.000Z",
+  "completed": false
 }
 ```
 
-#### PATCH `/api/tasks/:id`
+**Required Fields:**
+- `title` (string, 1-200 characters)
 
-Actualiza parcialmente una tarea.
+**Optional Fields:**
+- `description` (string, max 1000 characters)
+- `priority` (string): "low", "medium", "high" (default: "medium")
+- `dueDate` (string): ISO date string
+- `completed` (boolean, default: false)
 
-**Body:**
-```json
-{
-  "completed": true
-}
-```
+#### GET /api/tasks/:id
+Get a specific task by ID.
 
-#### DELETE `/api/tasks/:id`
+#### PUT /api/tasks/:id
+Update an entire task (replaces all fields).
 
-Elimina una tarea.
+#### PATCH /api/tasks/:id
+Partially update a task (only provided fields).
 
-**Respuesta:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440000"
-  },
-  "message": "Task deleted successfully"
-}
-```
+#### DELETE /api/tasks/:id
+Delete a specific task.
 
-### Operaciones de Estado
+### Task Actions
 
-#### PATCH `/api/tasks/:id/complete`
+#### PATCH /api/tasks/:id/complete
+Mark a task as completed.
 
-Marca una tarea como completada.
+#### PATCH /api/tasks/:id/incomplete
+Mark a task as incomplete.
 
-#### PATCH `/api/tasks/:id/incomplete`
+#### PATCH /api/tasks/:id/priority
+Update only the priority of a task.
 
-Marca una tarea como no completada.
-
-#### PATCH `/api/tasks/:id/priority`
-
-Actualiza solo la prioridad de una tarea.
-
-**Body:**
+**Request Body:**
 ```json
 {
   "priority": "high"
 }
 ```
 
-#### PATCH `/api/tasks/:id/due-date`
+#### PATCH /api/tasks/:id/due-date
+Update only the due date of a task.
 
-Actualiza solo la fecha de vencimiento.
-
-**Body:**
+**Request Body:**
 ```json
 {
-  "dueDate": "2024-01-25T23:59:59.999Z"
+  "dueDate": "2024-01-25T23:59:59.000Z"
 }
 ```
 
-### Estadísticas
+#### POST /api/tasks/:id/duplicate
+Duplicate an existing task.
 
-#### GET `/api/tasks/stats`
-
-Obtiene estadísticas de las tareas.
-
-**Respuesta:**
+**Request Body (optional):**
 ```json
 {
-  "success": true,
-  "data": {
-    "total": 50,
-    "completed": 25,
-    "pending": 25,
-    "overdue": 5,
-    "byPriority": {
-      "low": 15,
-      "medium": 20,
-      "high": 15
-    },
-    "completionRate": 50.0
+  "title": "Custom title for duplicate"
+}
+```
+
+### Date-based Queries
+
+#### GET /api/tasks/overdue
+Get all overdue tasks (due date in the past, not completed).
+
+#### GET /api/tasks/due-today
+Get tasks due today.
+
+#### GET /api/tasks/due-this-week
+Get tasks due this week (Sunday to Saturday).
+
+#### GET /api/tasks/due-next-week
+Get tasks due next week.
+
+#### GET /api/tasks/due-this-month
+Get tasks due this month.
+
+#### GET /api/tasks/date-range
+Get tasks in a custom date range.
+
+**Required Query Parameters:**
+- `startDate` (string): Start date (ISO format)
+- `endDate` (string): End date (ISO format)
+
+**Example:**
+```bash
+curl "http://localhost:3000/api/tasks/date-range?startDate=2024-01-01&endDate=2024-01-31"
+```
+
+### Bulk Operations
+
+#### POST /api/tasks/bulk/complete
+Mark multiple tasks as completed.
+
+**Request Body:**
+```json
+{
+  "ids": ["task-id-1", "task-id-2", "task-id-3"]
+}
+```
+
+#### POST /api/tasks/bulk/delete
+Delete multiple tasks.
+
+**Request Body:**
+```json
+{
+  "ids": ["task-id-1", "task-id-2", "task-id-3"]
+}
+```
+
+#### DELETE /api/tasks/bulk/completed
+Delete all completed tasks.
+
+### Search & Filter
+
+#### GET /api/tasks/search/:term
+Search tasks by a specific term in title and description.
+
+#### GET /api/tasks/priority/:priority
+Get tasks by priority level.
+
+**Valid priorities:** `low`, `medium`, `high`
+
+#### GET /api/tasks/completed/:status
+Get tasks by completion status.
+
+**Valid statuses:** `true`, `false`
+
+### Analytics & Statistics
+
+#### GET /api/tasks/stats
+Get comprehensive task statistics.
+
+**Response:**
+```json
+{
+  "total": 50,
+  "completed": 30,
+  "pending": 20,
+  "byPriority": {
+    "low": 15,
+    "medium": 25,
+    "high": 10
   },
-  "message": "Task statistics retrieved successfully"
+  "overdue": 5,
+  "completionRate": 60.0
 }
 ```
 
-### Operaciones en Lote
+#### GET /api/tasks/daily-summary
+Get enhanced daily summary with recommendations.
 
-#### POST `/api/tasks/bulk/complete`
-
-Marca múltiples tareas como completadas.
-
-**Body:**
+**Response:**
 ```json
 {
-  "ids": [
-    "550e8400-e29b-41d4-a716-446655440000",
-    "550e8400-e29b-41d4-a716-446655440001"
-  ]
-}
-```
-
-**Respuesta:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "title": "Tarea 1",
-      "completed": true,
-      // ... otros campos
-    }
+  "dueToday": 3,
+  "overdue": 2,
+  "completed": 30,
+  "highPriority": 5,
+  "recommendations": [
+    "🚨 URGENT: 1 high priority tasks are overdue!",
+    "⚡ Focus on 2 high priority tasks due today"
   ],
-  "message": "2 tasks marked as completed"
-}
-```
-
-#### DELETE `/api/tasks/bulk/completed`
-
-Elimina todas las tareas completadas.
-
-**Respuesta:**
-```json
-{
-  "success": true,
-  "data": {
-    "deletedCount": 15
+  "productivity": {
+    "completedToday": 2,
+    "completedThisWeek": 8,
+    "completionRate": 75.5
   },
-  "message": "15 completed tasks deleted"
-}
-```
-
-#### POST `/api/tasks/bulk/delete`
-
-Elimina múltiples tareas.
-
-**Body:**
-```json
-{
-  "ids": [
-    "550e8400-e29b-41d4-a716-446655440000",
-    "550e8400-e29b-41d4-a716-446655440001"
-  ]
-}
-```
-
-### Búsqueda y Filtros Especializados
-
-#### GET `/api/tasks/search/:term`
-
-Busca tareas por término específico.
-
-**Ejemplo:**
-```bash
-GET /api/tasks/search/importante?page=1&limit=10
-```
-
-#### GET `/api/tasks/priority/:priority`
-
-Obtiene tareas por prioridad específica.
-
-**Ejemplo:**
-```bash
-GET /api/tasks/priority/high
-```
-
-#### GET `/api/tasks/completed/:status`
-
-Obtiene tareas por estado de completado.
-
-**Ejemplo:**
-```bash
-GET /api/tasks/completed/true
-```
-
-#### GET `/api/tasks/overdue`
-
-Obtiene tareas vencidas.
-
-#### GET `/api/tasks/due-today`
-
-Obtiene tareas que vencen hoy.
-
-### Operaciones Especiales
-
-#### POST `/api/tasks/:id/duplicate`
-
-Duplica una tarea existente.
-
-**Body (opcional):**
-```json
-{
-  "title": "Nuevo título para la copia"
-}
-```
-
-## 🚦 Rate Limiting
-
-- **Límite por IP:** 100 requests por minuto
-- **Límite de operaciones en lote:** Máximo 100 elementos por operación
-- **Tamaño máximo de body:** 1MB
-
-## 📊 Códigos de Error Detallados
-
-### Errores de Validación (400)
-
-```json
-{
-  "success": false,
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Validation failed",
-    "details": {
-      "errors": [
-        "title is required",
-        "title must be at least 1 characters long",
-        "priority must be one of: low, medium, high"
-      ]
-    }
+  "urgentActions": {
+    "overdueHighPriority": 1,
+    "dueTodayHighPriority": 2
   }
 }
 ```
 
-### Recurso No Encontrado (404)
+## Query Parameters
 
-```json
-{
-  "success": false,
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "Task with ID 550e8400-e29b-41d4-a716-446655440000 not found"
-  }
-}
-```
+### Pagination
+- `page` (number): Page number (default: 1)
+- `limit` (number): Items per page (default: 10, max: 100)
 
-### Recurso Duplicado (409)
+### Sorting
+- `sortBy` (string): Field to sort by
+  - `createdAt` (default)
+  - `updatedAt`
+  - `title`
+  - `dueDate`
+  - `priority`
+- `sortOrder` (string): Sort direction
+  - `desc` (default)
+  - `asc`
 
-```json
-{
-  "success": false,
-  "error": {
-    "code": "DUPLICATE_ERROR",
-    "message": "Task with this title already exists"
-  }
-}
-```
+### Filtering
+- `completed` (boolean): Filter by completion status
+- `priority` (string): Filter by priority level
+- `search` (string): Search in title and description
+- `dueDateFrom` (string): Start date for date range filter
+- `dueDateTo` (string): End date for date range filter
 
-## 🔧 Ejemplos de Uso
+## Examples
 
-### Crear una Tarea Urgente
-
+### Create a high priority task
 ```bash
 curl -X POST http://localhost:3000/api/tasks \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Tarea urgente",
-    "description": "Esto es muy importante",
+    "title": "Fix critical bug",
+    "description": "Address the authentication issue in production",
     "priority": "high",
     "dueDate": "2024-01-16T17:00:00.000Z"
   }'
 ```
 
-### Obtener Tareas Pendientes de Alta Prioridad
-
+### Get overdue high priority tasks
 ```bash
-curl "http://localhost:3000/api/tasks?completed=false&priority=high&sortBy=dueDate&sortOrder=asc"
+curl "http://localhost:3000/api/tasks/overdue?priority=high"
 ```
 
-### Buscar Tareas
-
+### Search for tasks containing "meeting"
 ```bash
-curl "http://localhost:3000/api/tasks/search/importante"
+curl "http://localhost:3000/api/tasks/search/meeting"
 ```
 
-### Completar Múltiples Tareas
+### Get tasks due this week, sorted by due date
+```bash
+curl "http://localhost:3000/api/tasks/due-this-week?sortBy=dueDate&sortOrder=asc"
+```
 
+### Get tasks in date range with pagination
+```bash
+curl "http://localhost:3000/api/tasks/date-range?startDate=2024-01-01&endDate=2024-01-31&page=1&limit=20"
+```
+
+### Mark multiple tasks as completed
 ```bash
 curl -X POST http://localhost:3000/api/tasks/bulk/complete \
   -H "Content-Type: application/json" \
   -d '{
-    "ids": [
-      "550e8400-e29b-41d4-a716-446655440000",
-      "550e8400-e29b-41d4-a716-446655440001"
-    ]
+    "ids": ["clr123abc", "clr456def", "clr789ghi"]
   }'
 ```
 
-### Obtener Estadísticas
-
+### Update task priority
 ```bash
-curl http://localhost:3000/api/tasks/stats
+curl -X PATCH http://localhost:3000/api/tasks/clr123abc/priority \
+  -H "Content-Type: application/json" \
+  -d '{"priority": "high"}'
 ```
 
-### Filtrar por Fecha
-
+### Get daily summary
 ```bash
-curl "http://localhost:3000/api/tasks?dueDateFrom=2024-01-01&dueDateTo=2024-01-31"
+curl http://localhost:3000/api/tasks/daily-summary
 ```
 
-## 🔄 Paginación Avanzada
+## Database Configuration
 
-### Navegación por Páginas
+The API supports three database backends:
 
-```bash
-# Primera página
-GET /api/tasks?page=1&limit=10
+### Memory (Default)
+```env
+TODO_API_DB=memory
+```
+Perfect for development and testing. Data is lost when server restarts.
 
-# Página siguiente
-GET /api/tasks?page=2&limit=10
-
-# Última página (basada en totalPages del meta)
-GET /api/tasks?page=5&limit=10
+### MongoDB with Mongoose
+```env
+TODO_API_DB=mongoose
+MONGODB_URI=mongodb://localhost:27017/tasks
 ```
 
-### Metadatos de Paginación
+### SQL with Prisma
+```env
+TODO_API_DB=prisma
+DATABASE_URL="postgresql://username:password@localhost:5432/todo_api"
+```
+
+## Task Object Schema
 
 ```json
 {
-  "meta": {
-    "pagination": {
-      "page": 2,
-      "limit": 10,
-      "total": 50,
-      "totalPages": 5,
-      "hasNext": true,
-      "hasPrev": true,
-      "nextPage": 3,
-      "prevPage": 1
-    }
-  }
+  "id": "clr123abc456def789",
+  "title": "Complete project documentation",
+  "description": "Write comprehensive API documentation",
+  "completed": false,
+  "priority": "high",
+  "dueDate": "2024-01-20T23:59:59.000Z",
+  "createdAt": "2024-01-15T10:30:00.000Z",
+  "updatedAt": "2024-01-15T10:30:00.000Z"
 }
 ```
 
-## 📈 Mejores Prácticas
+### Field Specifications
 
-### Headers Recomendados
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| id | string | auto | Unique identifier (UUID or ObjectId) |
+| title | string | yes | Task title (1-200 characters) |
+| description | string\|null | no | Task description (max 1000 characters) |
+| completed | boolean | no | Completion status (default: false) |
+| priority | enum | no | Priority level: low, medium, high (default: medium) |
+| dueDate | string\|null | no | Due date in ISO format |
+| createdAt | string | auto | Creation timestamp |
+| updatedAt | string | auto | Last update timestamp |
 
-```bash
-# Siempre incluir Content-Type para POST/PUT/PATCH
-Content-Type: application/json
+## Rate Limiting
 
-# Para debugging
-X-Correlation-ID: unique-request-id
+Currently, no rate limiting is implemented. For production use, consider implementing rate limiting based on your requirements.
 
-# Información del cliente
-X-Client-Version: 1.0.0
-```
+## Best Practices
 
-### Manejo de Errores en Cliente
+1. **Pagination**: Always use pagination for large datasets
+2. **Filtering**: Use specific filters to reduce response size
+3. **Bulk Operations**: Use bulk endpoints for multiple operations
+4. **Date Formats**: Always use ISO 8601 format for dates
+5. **Error Handling**: Check the `success` field in responses
+6. **Validation**: Validate data before sending requests
 
-```javascript
-try {
-  const response = await fetch('/api/tasks', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(taskData)
-  });
-  
-  const result = await response.json();
-  
-  if (!result.success) {
-    console.error('Error:', result.error.message);
-    if (result.error.details) {
-      console.error('Details:', result.error.details);
-    }
-  }
-} catch (error) {
-  console.error('Network error:', error);
-}
-```
+## Version
 
-### Validación de Datos
+Current API Version: **2.0.0**
 
-Siempre validar datos antes de enviar:
+## Support
 
-```javascript
-const isValidTask = (task) => {
-  return task.title && 
-         task.title.length >= 1 && 
-         task.title.length <= 200 &&
-         ['low', 'medium', 'high'].includes(task.priority);
-};
-```
-
----
-
-## 📞 Soporte
-
-Para reportar problemas o solicitar funcionalidades:
-- **Issues:** [GitHub Issues](https://github.com/tu-usuario/todo-api/issues)
-- **Discusiones:** [GitHub Discussions](https://github.com/tu-usuario/todo-api/discussions)
-- **Email:** tu-email@ejemplo.com
-
----
-
-**Última actualización:** Enero 2024  
-**Versión de la API:** 1.0.0
+For issues and questions, please refer to the project repository or contact the development team.

@@ -1,9 +1,9 @@
 
-import { ITaskService } from '../interfaces/ITaskService';
-import { ITaskRepository } from '../interfaces/ITaskRepository';
+import type { ITaskService } from '../interfaces/ITaskService';
+import type { ITaskRepository } from '../interfaces/ITaskRepository';
 import { RepositoryFactory } from '../factories/RepositoryFactory';
 import { taskFactory } from '../factories/TaskFactory';
-import { Task, CreateTaskData, UpdateTaskData, TaskQueryOptions, PaginatedResult, TaskStatistics } from '../models/Task';
+import type { Task, CreateTaskData, UpdateTaskData, TaskQueryOptions, PaginatedResult, TaskStatistics } from '../models/Task';
 import { createError, createNotFoundError, createDuplicateError } from '../middleware/errorHandler';
 
 export class TaskService implements ITaskService {
@@ -47,7 +47,7 @@ export class TaskService implements ITaskService {
 
       // Usar factory para procesar y validar datos
       const processedData = taskFactory.createTaskData(taskData);
-      
+
       // Validaciones de negocio
       await this.validateBusinessRules(processedData);
 
@@ -74,7 +74,7 @@ export class TaskService implements ITaskService {
 
       // Procesar actualizaciones
       const processedUpdates = taskFactory.processTaskUpdates(updates);
-      
+
       // Validaciones de negocio
       const updatedTaskData = { ...existingTask, ...processedUpdates };
       await this.validateBusinessRules(updatedTaskData);
@@ -153,13 +153,13 @@ export class TaskService implements ITaskService {
   async getOverdueTasks(options: TaskQueryOptions = {}): Promise<PaginatedResult<Task>> {
     try {
       const overdueTasks = await this.repository.findOverdue();
-      
+
       // Aplicar filtros adicionales y paginación
       const filteredOptions = { ...options, completed: false };
       const allTasks = await this.repository.findAll(filteredOptions);
-      
+
       const now = new Date();
-      const filteredOverdue = allTasks.data.filter(task => 
+      const filteredOverdue = allTasks.data.filter(task =>
         task.dueDate && new Date(task.dueDate) < now
       );
 
@@ -178,13 +178,13 @@ export class TaskService implements ITaskService {
   async getTasksDueToday(options: TaskQueryOptions = {}): Promise<PaginatedResult<Task>> {
     try {
       const todayTasks = await this.repository.findDueToday();
-      
+
       // Aplicar paginación si es necesario
       const page = options.page || 1;
       const limit = options.limit || 10;
       const startIndex = (page - 1) * limit;
       const endIndex = startIndex + limit;
-      
+
       const paginatedTasks = todayTasks.slice(startIndex, endIndex);
       const total = todayTasks.length;
       const totalPages = Math.ceil(total / limit);
@@ -211,7 +211,7 @@ export class TaskService implements ITaskService {
       if (!originalTask) return null;
 
       const duplicateTitle = newTitle || `${originalTask.title} (Copy)`;
-      
+
       if (await this.repository.existsByTitle(duplicateTitle)) {
         throw createDuplicateError('Task', 'title');
       }
@@ -239,6 +239,15 @@ export class TaskService implements ITaskService {
     completed: number;
     highPriority: number;
     recommendations: string[];
+    productivity: {
+      completedToday: number;
+      completedThisWeek: number;
+      completionRate: number;
+    };
+    urgentActions: {
+      overdueHighPriority: number;
+      dueTodayHighPriority: number;
+    };
   }> {
     try {
       const [stats, dueToday, overdue, highPriority] = await Promise.all([
@@ -249,22 +258,69 @@ export class TaskService implements ITaskService {
       ]);
 
       const highPriorityPending = highPriority.filter(task => !task.completed);
+      const overdueHighPriority = overdue.filter(task => task.priority === 'high');
+      const dueTodayHighPriority = dueToday.filter(task => task.priority === 'high');
+
+      // Calcular tareas completadas hoy (aproximación basada en updatedAt)
+      const today = new Date();
+      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const allTasks = await this.repository.findAll({ limit: 1000 });
+      const completedToday = allTasks.data.filter(task =>
+        task.completed && task.updatedAt >= startOfToday
+      ).length;
+
+      // Calcular tareas completadas esta semana
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay());
+      startOfWeek.setHours(0, 0, 0, 0);
+      const completedThisWeek = allTasks.data.filter(task =>
+        task.completed && task.updatedAt >= startOfWeek
+      ).length;
+
       const recommendations: string[] = [];
 
-      if (overdue.length > 0) {
-        recommendations.push(`You have ${overdue.length} overdue tasks that need attention`);
+      // Generar recomendaciones inteligentes
+      if (overdueHighPriority.length > 0) {
+        recommendations.push(`🚨 URGENT: ${overdueHighPriority.length} high priority tasks are overdue!`);
       }
-      
+
+      if (dueTodayHighPriority.length > 0) {
+        recommendations.push(`⚡ Focus on ${dueTodayHighPriority.length} high priority tasks due today`);
+      }
+
+      if (overdue.length > 5) {
+        recommendations.push(`📋 Consider rescheduling ${overdue.length} overdue tasks`);
+      } else if (overdue.length > 0) {
+        recommendations.push(`⏰ Address ${overdue.length} overdue tasks when possible`);
+      }
+
       if (dueToday.length > 0) {
-        recommendations.push(`Focus on ${dueToday.length} tasks due today`);
+        recommendations.push(`🎯 Today's focus: ${dueToday.length} tasks due`);
       }
-      
-      if (highPriorityPending.length > 0) {
-        recommendations.push(`Prioritize ${highPriorityPending.length} high priority tasks`);
+
+      if (highPriorityPending.length > 3) {
+        recommendations.push(`📈 High workload: ${highPriorityPending.length} high priority tasks pending`);
       }
-      
-      if (stats.completionRate < 50) {
-        recommendations.push('Consider breaking down large tasks into smaller ones');
+
+      if (stats.completionRate < 30) {
+        recommendations.push('💡 Tip: Break large tasks into smaller, manageable chunks');
+      } else if (stats.completionRate > 80) {
+        recommendations.push('🎉 Great job! You\'re maintaining a high completion rate');
+      }
+
+      if (completedToday === 0 && dueToday.length > 0) {
+        recommendations.push('🌅 Start your day by completing one small task');
+      } else if (completedToday > 0) {
+        recommendations.push(`✅ Good progress: ${completedToday} tasks completed today`);
+      }
+
+      // Si no hay recomendaciones específicas, dar consejos generales
+      if (recommendations.length === 0) {
+        if (stats.pending === 0) {
+          recommendations.push('🎊 All caught up! Great work!');
+        } else {
+          recommendations.push('📝 Review your task list and prioritize your next actions');
+        }
       }
 
       return {
@@ -272,7 +328,16 @@ export class TaskService implements ITaskService {
         overdue: overdue.length,
         completed: stats.completed,
         highPriority: highPriorityPending.length,
-        recommendations
+        recommendations,
+        productivity: {
+          completedToday,
+          completedThisWeek,
+          completionRate: stats.completionRate
+        },
+        urgentActions: {
+          overdueHighPriority: overdueHighPriority.length,
+          dueTodayHighPriority: dueTodayHighPriority.length
+        }
       };
     } catch (error) {
       throw createError('Failed to generate daily summary', 500, 'DAILY_SUMMARY_ERROR', error);
@@ -290,7 +355,7 @@ export class TaskService implements ITaskService {
       const dueDate = new Date(taskData.dueDate);
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      
+
       if (dueDate < today) {
         throw createError('Due date cannot be in the past', 400, 'INVALID_DUE_DATE');
       }

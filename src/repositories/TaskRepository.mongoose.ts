@@ -39,7 +39,7 @@ const TaskSchema = new Schema(
     timestamps: true,
     toJSON: {
       virtuals: true,
-      transform: function(doc, ret) {
+      transform: function (doc, ret) {
         ret.id = ret._id.toString();
         delete ret._id;
         delete ret.__v;
@@ -48,7 +48,7 @@ const TaskSchema = new Schema(
     },
     toObject: {
       virtuals: true,
-      transform: function(doc, ret) {
+      transform: function (doc, ret) {
         ret.id = ret._id.toString();
         delete ret._id;
         delete ret.__v;
@@ -83,30 +83,7 @@ export class TaskRepositoryMongoose implements ITaskRepository {
     this.model = mongoose.model<ITaskDocument>('Task', TaskSchema);
   }
 
-  async create(taskData: CreateTaskData): Promise<Task> {
-    const task = new this.model({
-      title: taskData.title,
-      description: taskData.description || null,
-      completed: taskData.completed || false,
-      priority: taskData.priority || 'medium',
-      dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
-    });
-
-    await task.save();
-    return this.documentToTask(task);
-  }
-
-  async findById(id: string): Promise<Task | null> {
-    try {
-      const task = await this.model.findById(id).lean();
-      return task ? this.documentToTask(task) : null;
-    } catch (error) {
-      if (error instanceof mongoose.Error.CastError) {
-        return null;
-      }
-      throw error;
-    }
-  }
+  // repositories/TaskRepository.mongoose.ts - Método findAll actualizado
 
   async findAll(options: TaskQueryOptions = {}): Promise<PaginatedResult<Task>> {
     const {
@@ -132,10 +109,24 @@ export class TaskRepositoryMongoose implements ITaskRepository {
       filter.priority = priority;
     }
 
+    // ✅ MEJORADO: Filtros de fecha más robustos
     if (dueDateFrom || dueDateTo) {
       filter.dueDate = {};
-      if (dueDateFrom) filter.dueDate.$gte = dueDateFrom;
-      if (dueDateTo) filter.dueDate.$lte = dueDateTo;
+
+      if (dueDateFrom) {
+        const fromDate = new Date(dueDateFrom);
+        fromDate.setHours(0, 0, 0, 0); // Inicio del día
+        filter.dueDate.$gte = fromDate;
+      }
+
+      if (dueDateTo) {
+        const toDate = new Date(dueDateTo);
+        toDate.setHours(23, 59, 59, 999); // Final del día
+        filter.dueDate.$lte = toDate;
+      }
+
+      // Excluir tasks sin fecha de vencimiento
+      filter.dueDate.$ne = null;
     }
 
     if (search) {
@@ -184,10 +175,56 @@ export class TaskRepositoryMongoose implements ITaskRepository {
     };
   }
 
+  // NUEVO: Método para encontrar tasks por rango de fechas
+  async findByDateRange(startDate: Date, endDate: Date): Promise<Task[]> {
+    const endOfDay = new Date(endDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const startOfDay = new Date(startDate);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const tasks = await this.model
+      .find({
+        dueDate: {
+          $gte: startOfDay,
+          $lte: endOfDay,
+          $ne: null
+        }
+      })
+      .lean();
+
+    return tasks.map(task => this.documentToTask(task));
+  }
+
+  async create(taskData: CreateTaskData): Promise<Task> {
+    const task = new this.model({
+      title: taskData.title,
+      description: taskData.description || null,
+      completed: taskData.completed || false,
+      priority: taskData.priority || 'medium',
+      dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
+    });
+
+    await task.save();
+    return this.documentToTask(task);
+  }
+
+  async findById(id: string): Promise<Task | null> {
+    try {
+      const task = await this.model.findById(id).lean();
+      return task ? this.documentToTask(task) : null;
+    } catch (error) {
+      if (error instanceof mongoose.Error.CastError) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
   async update(id: string, updates: UpdateTaskData): Promise<Task | null> {
     try {
       const processedUpdates: any = { ...updates };
-      
+
       if (updates.dueDate !== undefined) {
         processedUpdates.dueDate = updates.dueDate ? new Date(updates.dueDate) : null;
       }
@@ -302,7 +339,7 @@ export class TaskRepositoryMongoose implements ITaskRepository {
 
   async markMultipleAsCompleted(ids: string[]): Promise<Task[]> {
     const validIds = ids.filter(id => mongoose.Types.ObjectId.isValid(id));
-    
+
     if (validIds.length === 0) {
       return [];
     }
@@ -330,7 +367,7 @@ export class TaskRepositoryMongoose implements ITaskRepository {
 
   async bulkDelete(ids: string[]): Promise<number> {
     const validIds = ids.filter(id => mongoose.Types.ObjectId.isValid(id));
-    
+
     if (validIds.length === 0) {
       return 0;
     }

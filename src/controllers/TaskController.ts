@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { taskService } from '../services';
-import { 
-  sendSuccess, 
-  sendCreated, 
-  sendNotFound, 
-  sendBadRequest, 
+import {
+  sendSuccess,
+  sendCreated,
+  sendNotFound,
+  sendBadRequest,
   sendPaginated,
-  sendInternalError 
+  sendInternalError
 } from '../utils/responseHelper';
 import { TaskQueryOptions } from '../models/Task';
 
@@ -32,7 +32,7 @@ class TaskController {
       };
 
       const result = await taskService.getAllTasks(options);
-      
+      console.log('Tasks retrieved:', result.data.length, 'Total:', result.meta.total);
       sendPaginated(
         res,
         result.data,
@@ -253,7 +253,7 @@ class TaskController {
       };
 
       const result = await taskService.getAllTasks(options);
-      
+
       sendPaginated(
         res,
         result.data,
@@ -283,7 +283,7 @@ class TaskController {
       };
 
       const result = await taskService.getAllTasks(options);
-      
+
       sendPaginated(
         res,
         result.data,
@@ -305,7 +305,7 @@ class TaskController {
     try {
       const { status } = req.params;
       const completed = status === 'true';
-      
+
       const options: TaskQueryOptions = {
         completed,
         sortBy: req.query.sortBy as 'createdAt' | 'updatedAt' | 'title' | 'dueDate' | undefined,
@@ -315,7 +315,7 @@ class TaskController {
       };
 
       const result = await taskService.getAllTasks(options);
-      
+
       sendPaginated(
         res,
         result.data,
@@ -343,7 +343,7 @@ class TaskController {
       };
 
       const result = await taskService.getOverdueTasks(options);
-      
+
       sendPaginated(
         res,
         result.data,
@@ -371,7 +371,7 @@ class TaskController {
       };
 
       const result = await taskService.getTasksDueToday(options);
-      
+
       sendPaginated(
         res,
         result.data,
@@ -464,6 +464,160 @@ class TaskController {
     try {
       const summary = await taskService.getDailySummary();
       sendSuccess(res, summary, 'Daily summary retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+ * GET /api/tasks/due-this-week
+ * Obtener tasks que vencen esta semana
+ */
+  async getTasksDueThisWeek(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const today = new Date();
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay()); // Domingo
+      startOfWeek.setHours(0, 0, 0, 0);
+
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6); // Sábado
+      endOfWeek.setHours(23, 59, 59, 999);
+
+      const options: TaskQueryOptions = {
+        dueDateFrom: startOfWeek,
+        dueDateTo: endOfWeek,
+        completed: false,
+        sortBy: req.query.sortBy as 'createdAt' | 'updatedAt' | 'title' | 'dueDate' | undefined,
+        sortOrder: req.query.sortOrder as 'asc' | 'desc' | undefined,
+        page: req.query.page ? parseInt(req.query.page as string) : undefined,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined
+      };
+
+      const result = await taskService.getAllTasks(options);
+
+      sendPaginated(
+        res,
+        result.data,
+        result.meta.total,
+        result.meta.page,
+        result.meta.limit,
+        'Tasks due this week'
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/tasks/due-next-week
+   * Obtener tasks que vencen la próxima semana
+   */
+  async getTasksDueNextWeek(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const today = new Date();
+      const nextWeekStart = new Date(today);
+      nextWeekStart.setDate(today.getDate() + (7 - today.getDay())); // Próximo domingo
+      nextWeekStart.setHours(0, 0, 0, 0);
+
+      const nextWeekEnd = new Date(nextWeekStart);
+      nextWeekEnd.setDate(nextWeekStart.getDate() + 6); // Próximo sábado
+      nextWeekEnd.setHours(23, 59, 59, 999);
+
+      const options: TaskQueryOptions = {
+        dueDateFrom: nextWeekStart,
+        dueDateTo: nextWeekEnd,
+        completed: false,
+        sortBy: req.query.sortBy as 'createdAt' | 'updatedAt' | 'title' | 'dueDate' | undefined,
+        sortOrder: req.query.sortOrder as 'asc' | 'desc' | undefined,
+        page: req.query.page ? parseInt(req.query.page as string) : undefined,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined
+      };
+
+      const result = await taskService.getAllTasks(options);
+
+      sendPaginated(
+        res,
+        result.data,
+        result.meta.total,
+        result.meta.page,
+        result.meta.limit,
+        'Tasks due next week'
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/tasks/due-this-month
+   * Obtener tasks que vencen este mes
+   */
+  async getTasksDueThisMonth(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const today = new Date();
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+
+      const options: TaskQueryOptions = {
+        dueDateFrom: startOfMonth,
+        dueDateTo: endOfMonth,
+        completed: false,
+        sortBy: req.query.sortBy as 'createdAt' | 'updatedAt' | 'title' | 'dueDate' | undefined,
+        sortOrder: req.query.sortOrder as 'asc' | 'desc' | undefined,
+        page: req.query.page ? parseInt(req.query.page as string) : undefined,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined
+      };
+
+      const result = await taskService.getAllTasks(options);
+
+      sendPaginated(
+        res,
+        result.data,
+        result.meta.total,
+        result.meta.page,
+        result.meta.limit,
+        'Tasks due this month'
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/tasks/date-range
+   * Obtener tasks en un rango de fechas específico
+   */
+  async getTasksByDateRange(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { startDate, endDate } = req.query;
+
+      if (!startDate || !endDate) {
+        sendBadRequest(res, 'startDate and endDate are required');
+        return;
+      }
+
+      const options: TaskQueryOptions = {
+        dueDateFrom: new Date(startDate as string),
+        dueDateTo: new Date(endDate as string),
+        completed: req.query.completed ? req.query.completed === 'true' : undefined,
+        priority: req.query.priority as 'low' | 'medium' | 'high' | undefined,
+        sortBy: req.query.sortBy as 'createdAt' | 'updatedAt' | 'title' | 'dueDate' | undefined,
+        sortOrder: req.query.sortOrder as 'asc' | 'desc' | undefined,
+        page: req.query.page ? parseInt(req.query.page as string) : undefined,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined
+      };
+
+      const result = await taskService.getAllTasks(options);
+
+      sendPaginated(
+        res,
+        result.data,
+        result.meta.total,
+        result.meta.page,
+        result.meta.limit,
+        `Tasks between ${startDate} and ${endDate}`
+      );
     } catch (error) {
       next(error);
     }

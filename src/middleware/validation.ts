@@ -155,7 +155,18 @@ export const validateTaskUpdate = (req: Request, res: Response, next: NextFuncti
  * Middleware para validar parámetros de query (filtros, paginación, etc.)
  */
 export const validateQueryParams = (req: Request, res: Response, next: NextFunction): void => {
-  const { completed, priority, sortBy, sortOrder, page, limit, search } = req.query;
+  const { 
+    completed, 
+    priority, 
+    sortBy, 
+    sortOrder, 
+    page, 
+    limit, 
+    search,
+    dueDateFrom,  // 
+    dueDateTo     // 
+  } = req.query;
+  
   const errors: string[] = [];
 
   // Validar completed
@@ -204,6 +215,42 @@ export const validateQueryParams = (req: Request, res: Response, next: NextFunct
     }
   }
 
+  // : Validar dueDateFrom
+  if (dueDateFrom !== undefined) {
+    if (typeof dueDateFrom !== 'string') {
+      errors.push('dueDateFrom must be a valid date string');
+    } else {
+      const fromDate = new Date(dueDateFrom as string);
+      if (isNaN(fromDate.getTime())) {
+        errors.push('dueDateFrom must be a valid date format (ISO 8601)');
+      }
+    }
+  }
+
+  // : Validar dueDateTo
+  if (dueDateTo !== undefined) {
+    if (typeof dueDateTo !== 'string') {
+      errors.push('dueDateTo must be a valid date string');
+    } else {
+      const toDate = new Date(dueDateTo as string);
+      if (isNaN(toDate.getTime())) {
+        errors.push('dueDateTo must be a valid date format (ISO 8601)');
+      }
+    }
+  }
+
+  // : Validar que dueDateFrom no sea posterior a dueDateTo
+  if (dueDateFrom && dueDateTo) {
+    const fromDate = new Date(dueDateFrom as string);
+    const toDate = new Date(dueDateTo as string);
+    
+    if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime())) {
+      if (fromDate > toDate) {
+        errors.push('dueDateFrom cannot be later than dueDateTo');
+      }
+    }
+  }
+
   if (errors.length > 0) {
     sendBadRequest(res, 'Query parameter validation failed', { errors });
     return;
@@ -216,7 +263,6 @@ export const validateQueryParams = (req: Request, res: Response, next: NextFunct
 
   next();
 };
-
 /**
  * Middleware para validar parámetros de URL específicos
  */

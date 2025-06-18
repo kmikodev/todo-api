@@ -1,6 +1,6 @@
 import testData from './test_data.json';
 
-const API_BASE_URL = process.env.API_URL || 'http://localhost:3010/api';
+const API_BASE_URL = process.env.API_URL || 'http://localhost:3000/api';
 
 async function populateDatabase() {
   console.log('🚀 Iniciando población de la base de datos...');

@@ -32,10 +32,10 @@ export class TaskRepositoryMemory implements ITaskRepository {
 
     // Aplicar filtros
     filteredTasks = this.applyFilters(filteredTasks, options);
-    
+
     // Aplicar ordenamiento
     filteredTasks = this.applySorting(filteredTasks, options);
-    
+
     // Aplicar paginación
     return this.applyPagination(filteredTasks, options);
   }
@@ -63,20 +63,20 @@ export class TaskRepositoryMemory implements ITaskRepository {
 
   async existsByTitle(title: string, excludeId?: string): Promise<boolean> {
     const normalizedTitle = title.toLowerCase().trim();
-    
+
     for (const task of this.tasks.values()) {
       if (task.id !== excludeId && task.title.toLowerCase().trim() === normalizedTitle) {
         return true;
       }
     }
-    
+
     return false;
   }
 
   async getStatistics(): Promise<TaskStatistics> {
     const tasks = Array.from(this.tasks.values());
     const now = new Date();
-    
+
     const completed = tasks.filter(task => task.completed).length;
     const total = tasks.length;
 
@@ -89,9 +89,9 @@ export class TaskRepositoryMemory implements ITaskRepository {
         medium: tasks.filter(task => task.priority === 'medium').length,
         high: tasks.filter(task => task.priority === 'high').length
       },
-      overdue: tasks.filter(task => 
-        !task.completed && 
-        task.dueDate && 
+      overdue: tasks.filter(task =>
+        !task.completed &&
+        task.dueDate &&
         task.dueDate < now
       ).length,
       completionRate: total > 0 ? Math.round((completed / total) * 100 * 100) / 100 : 0
@@ -134,9 +134,9 @@ export class TaskRepositoryMemory implements ITaskRepository {
 
   async findOverdue(): Promise<Task[]> {
     const now = new Date();
-    return Array.from(this.tasks.values()).filter(task => 
-      !task.completed && 
-      task.dueDate && 
+    return Array.from(this.tasks.values()).filter(task =>
+      !task.completed &&
+      task.dueDate &&
       task.dueDate < now
     );
   }
@@ -164,40 +164,6 @@ export class TaskRepositoryMemory implements ITaskRepository {
     this.tasks.clear();
   }
 
-  // Métodos auxiliares privados
-  private applyFilters(tasks: Task[], options: TaskQueryOptions): Task[] {
-    let filtered = [...tasks];
-
-    if (options.completed !== undefined) {
-      filtered = filtered.filter(task => task.completed === options.completed);
-    }
-
-    if (options.priority) {
-      filtered = filtered.filter(task => task.priority === options.priority);
-    }
-
-    if (options.search) {
-      const searchTerm = options.search.toLowerCase();
-      filtered = filtered.filter(task =>
-        task.title.toLowerCase().includes(searchTerm) ||
-        (task.description && task.description.toLowerCase().includes(searchTerm))
-      );
-    }
-
-    if (options.dueDateFrom) {
-      filtered = filtered.filter(task => 
-        task.dueDate && task.dueDate >= options.dueDateFrom!
-      );
-    }
-
-    if (options.dueDateTo) {
-      filtered = filtered.filter(task => 
-        task.dueDate && task.dueDate <= options.dueDateTo!
-      );
-    }
-
-    return filtered;
-  }
 
   private applySorting(tasks: Task[], options: TaskQueryOptions): Task[] {
     const sortBy = options.sortBy || 'createdAt';
@@ -237,7 +203,7 @@ export class TaskRepositoryMemory implements ITaskRepository {
     const limit = options.limit || 10;
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-    
+
     const paginatedTasks = tasks.slice(startIndex, endIndex);
     const total = tasks.length;
     const totalPages = Math.ceil(total / limit);
@@ -253,5 +219,58 @@ export class TaskRepositoryMemory implements ITaskRepository {
         hasPrev: page > 1
       }
     };
+  }
+
+  private applyFilters(tasks: Task[], options: TaskQueryOptions): Task[] {
+    let filtered = [...tasks];
+
+    if (options.completed !== undefined) {
+      filtered = filtered.filter(task => task.completed === options.completed);
+    }
+
+    if (options.priority) {
+      filtered = filtered.filter(task => task.priority === options.priority);
+    }
+
+    if (options.search) {
+      const searchTerm = options.search.toLowerCase();
+      filtered = filtered.filter(task =>
+        task.title.toLowerCase().includes(searchTerm) ||
+        (task.description && task.description.toLowerCase().includes(searchTerm))
+      );
+    }
+
+    // : Filtro dueDateFrom
+    if (options.dueDateFrom) {
+      const fromDate = new Date(options.dueDateFrom);
+      filtered = filtered.filter(task => {
+        if (!task.dueDate) return false;
+        return new Date(task.dueDate) >= fromDate;
+      });
+    }
+
+    // : Filtro dueDateTo
+    if (options.dueDateTo) {
+      const toDate = new Date(options.dueDateTo);
+      // Incluir todo el día final
+      toDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(task => {
+        if (!task.dueDate) return false;
+        return new Date(task.dueDate) <= toDate;
+      });
+    }
+
+    return filtered;
+  }
+
+  // Método auxiliar para obtener tasks por rango de fechas
+  async findByDateRange(startDate: Date, endDate: Date): Promise<Task[]> {
+    const tasks = Array.from(this.tasks.values());
+
+    return tasks.filter(task => {
+      if (!task.dueDate) return false;
+      const dueDate = new Date(task.dueDate);
+      return dueDate >= startDate && dueDate <= endDate;
+    });
   }
 }

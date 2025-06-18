@@ -1,3 +1,4 @@
+// routes/taskRoutes.ts - Rutas actualizadas
 
 import { Router } from 'express';
 import { taskController } from '../controllers/TaskController';
@@ -24,6 +25,12 @@ taskRoutes.get('/stats', taskController.getTaskStats);
 taskRoutes.get('/daily-summary', taskController.getDailySummary);
 taskRoutes.get('/overdue', validateQueryParams, taskController.getOverdueTasks);
 taskRoutes.get('/due-today', validateQueryParams, taskController.getTasksDueToday);
+
+// ✅ NUEVAS RUTAS: Filtros de fecha específicos
+taskRoutes.get('/due-this-week', validateQueryParams, taskController.getTasksDueThisWeek);
+taskRoutes.get('/due-next-week', validateQueryParams, taskController.getTasksDueNextWeek);
+taskRoutes.get('/due-this-month', validateQueryParams, taskController.getTasksDueThisMonth);
+taskRoutes.get('/date-range', validateQueryParams, taskController.getTasksByDateRange);
 
 // Rutas de operaciones en lote
 taskRoutes.post('/bulk/complete', validateBulkIds, taskController.bulkCompleteTask);
